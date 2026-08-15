@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useLayoutEffect } from "react";
 import Lottie from "lottie-react";
-import splashAnimation from "@/animations/splash.json";
+import splashDesktop from "@/animations/splash_desktop.json";
+import splashMobile from "@/animations/splash_mobile.json";
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -10,23 +11,38 @@ interface SplashScreenProps {
 
 export default function SplashScreen({ onComplete }: SplashScreenProps) {
   const [isVisible, setIsVisible] = useState(true);
+  const [animationData, setAnimationData] = useState<any>(null);
+
+  useLayoutEffect(() => {
+    // Check screen size to determine which animation asset to load
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    setAnimationData(isMobile ? splashMobile : splashDesktop);
+  }, []);
 
   useEffect(() => {
     const html = document.documentElement;
     const body = document.body;
     const prevHtmlOverflow = html.style.overflow;
+    const prevHtmlScrollBehavior = html.style.scrollBehavior;
     const prevBodyOverflow = body.style.overflow;
     const prevBodyTouchAction = body.style.touchAction;
     const prevBodyOverscroll = body.style.overscrollBehavior;
+    const prevBodyPosition = body.style.position;
 
+    // Disable scroll and interactions
     html.style.overflow = "hidden";
+    html.style.scrollBehavior = "auto";
     body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.width = "100%";
     body.style.touchAction = "none";
     body.style.overscrollBehavior = "none";
 
     return () => {
       html.style.overflow = prevHtmlOverflow;
+      html.style.scrollBehavior = prevHtmlScrollBehavior;
       body.style.overflow = prevBodyOverflow;
+      body.style.position = prevBodyPosition;
       body.style.touchAction = prevBodyTouchAction;
       body.style.overscrollBehavior = prevBodyOverscroll;
     };
@@ -41,9 +57,8 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
     <div
       role="presentation"
       aria-hidden
-      className={`fixed inset-0 z-[9999] bg-[#1baf9a] w-screen h-screen max-h-[100dvh] transition-opacity duration-300 ${
-        isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
-      }`}
+      className={`fixed inset-0 z-[9999] bg-[#1baf9a] w-screen h-screen max-h-[100dvh] transition-opacity duration-300 ${isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
       style={{
         willChange: "opacity",
         margin: 0,
@@ -54,17 +69,23 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
         bottom: 0,
       }}
     >
-      <Lottie
-        animationData={splashAnimation}
-        loop={false}
-        autoplay={true}
-        onComplete={handleAnimationComplete}
-        className="w-full h-full"
-        rendererSettings={{
-          preserveAspectRatio: "xMidYMid slice",
-        }}
-        style={{ width: "100vw", height: "100vh", maxHeight: "100dvh" }}
-      />
+      {animationData && (
+        <Lottie
+          animationData={animationData}
+          loop={false}
+          autoplay={true}
+          onComplete={handleAnimationComplete}
+          className="w-full h-full"
+          rendererSettings={{
+            preserveAspectRatio: "xMidYMid slice",
+          }}
+          style={{
+            width: "100vw",
+            height: "100vh",
+            maxHeight: "100dvh",
+          }}
+        />
+      )}
     </div>
   );
 }
