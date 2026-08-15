@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  frontend:
+    image: ghcr.io/shreya-logicgo/viteezy-v2-frontend:dev
+
+    container_name: viteezy_frontend
+    restart: always
+
+    ports:
+      - "127.0.0.1:8081:3000"
+
+    # SECURITY HARDENING
+    read_only: true
+
+    tmpfs:
+      - /tmp
+      - /var/tmp
+
+    volumes:
+      - ./next-cache:/app/.next/cache
+
+    security_opt:
+      - no-new-privileges:true
+
+    cap_drop:
+      - ALL
+
+    pids_limit: 200
+    mem_limit: 512m
+    cpus: 1.0

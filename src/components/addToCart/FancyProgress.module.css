@@ -1,0 +1,194 @@
+/* Outer wrapper just for layout/demo */
+.wrapper {
+    width: 100%;
+    max-width: 600px;
+    padding: 16px 0;
+}
+
+/* === core sizes/colors – tune if needed === */
+:root {
+    --circle-outer: 26px;
+    /* full outer circle diameter */
+    --circle-border: 4px;
+    /* thickness of the cream ring  */
+    --track-height: 6px;
+    --track-bg: #f3f1e7;
+    /* cream track */
+    --fill-start: #00b39b;
+    /* teal */
+    --fill-end: #d2dcc0;
+    /* light green */
+}
+
+/* Main progress container (holds circles + track) */
+.progress {
+    position: relative;
+    height: var(--circle-outer);
+}
+
+/* Circles (outer cream rings) */
+.progress::before,
+.progress::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: var(--circle-outer);
+    height: var(--circle-outer);
+    border-radius: 999px;
+    border: var(--circle-border) solid var(--track-bg);
+    background: #ffffff;
+    transform: translateY(-50%);
+}
+
+/* left ring */
+.progress::before {
+    left: 0;
+}
+
+/* right ring */
+.progress::after {
+    right: 0;
+}
+
+/* Grey track between the two circle centers */
+.track {
+    position: absolute;
+    top: 50%;
+    left: calc(var(--circle-outer) / 2);
+    right: calc(var(--circle-outer) / 2);
+    height: var(--track-height);
+    background: var(--track-bg);
+    border-radius: 999px;
+    transform: translateY(-50%);
+    overflow: visible;
+    z-index: 1;
+}
+
+/* Filled part */
+.fill {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: var(--track-height);
+    transform: translateY(-50%);
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--fill-start), var(--fill-end));
+
+    /* width = percentage of track */
+    width: calc(var(--value) * 100%);
+
+    /* smooth change */
+    transition: width 0.25s ease-out;
+    z-index: 2;
+}
+
+/* Teal inner circle that sits inside the left ring and blends into the bar */
+.fill::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translate(-50%, -50%);
+    width: calc(var(--circle-outer) - 2 * var(--circle-border));
+    height: calc(var(--circle-outer) - 2 * var(--circle-border));
+    border-radius: 999px;
+    background: var(--fill-start);
+    z-index: 3;
+}
+
+/* End circle - filled inner circle at right end when progress is complete */
+.fill::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translate(50%, -50%);
+    width: calc(var(--circle-outer) - 2 * var(--circle-border));
+    height: calc(var(--circle-outer) - 2 * var(--circle-border));
+    border-radius: 999px;
+    background: var(--fill-end);
+    z-index: 3;
+}
+
+/* Add a visible inner circle to right ring when progress is complete */
+.rightCircle {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: calc(var(--circle-outer) / 2);
+    transform: translate(50%, -50%);
+    width: calc(var(--circle-outer) - 2 * var(--circle-border));
+    height: calc(var(--circle-outer) - 2 * var(--circle-border));
+    border-radius: 999px;
+    background: var(--fill-end);
+    opacity: 0;
+    transition: opacity 0.25s ease-out;
+    z-index: 4;
+    pointer-events: none;
+}
+
+.rightCircle.visible {
+    opacity: 1;
+}
+
+/* Middle circle outer ring - cream border at center */
+.middleCircleRing {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: var(--circle-outer);
+    height: var(--circle-outer);
+    border-radius: 999px;
+    border: var(--circle-border) solid var(--track-bg);
+    background: #ffffff;
+    opacity: 0;
+    transition: opacity 0.25s ease-out;
+    z-index: 4;
+    pointer-events: none;
+}
+
+.middleCircleRing.visible {
+    opacity: 1;
+}
+
+/* Middle circle inner fill - gradient fill inside the ring */
+.middleCircleFill {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(var(--circle-outer) - 2 * var(--circle-border));
+    height: calc(var(--circle-outer) - 2 * var(--circle-border));
+    border-radius: 999px;
+    background: linear-gradient(90deg,
+            color-mix(in srgb, var(--fill-start) 50%, var(--fill-end) 50%) 50%,
+            #ffffff 50%);
+    opacity: 0;
+    transition: opacity 0.25s ease-out;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.middleCircleFill.visible {
+    opacity: 1;
+}
+
+
+/* Demo buttons (remove in production) */
+.buttons {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.buttons button {
+    padding: 4px 8px;
+    border-radius: 999px;
+    border: 1px solid #ddd;
+    font-size: 12px;
+    background: #fff;
+    cursor: pointer;
+}
